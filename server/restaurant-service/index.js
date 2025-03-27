@@ -7,6 +7,7 @@ import mongoose from "mongoose";           // MongoDB Object Data Modeling (ODM)
 import helmet from "helmet";               // Adds security-related HTTP headers
 import morgan from "morgan";               // Logs HTTP requests in the console (for debugging)
 import connectDB from "./config/connectDB.js"; // Custom function to connect to MongoDB
+import userRouter from "./routes/user.route.js";
 
 
 //  Load environment variables (like PORT, MONGODB_URI, FRONTEND_URL) from .env file
@@ -54,7 +55,8 @@ app.get("/", (req, res) => {
 });
 // You can visit http://localhost:PORT in your browser to see this message
 
-
+//in hear i setup api for routs
+app.use("/api/user",userRouter)
 
 //  Connect to MongoDB using Mongoose
 connectDB();
