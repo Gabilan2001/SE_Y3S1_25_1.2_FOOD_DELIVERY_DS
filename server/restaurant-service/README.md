@@ -7,4 +7,4 @@ npm install resend --- to sen mails
 npm i cloudinary --- to store image
 npm i multer --- to convert the image in bite code
 
-3.26.34
+3.40.01
