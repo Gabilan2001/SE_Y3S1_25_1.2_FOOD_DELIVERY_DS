@@ -5,11 +5,11 @@ import verifyEmailTemplate from "../utils/verifyEmailTemplate.js"; // HTML templ
 import { response, text } from "express";
 import generatedAccessToken from "../utils/generatedAccessToken.js";
 import generatedRefreshToken from "../utils/generatedRefreshToken.js";
-// import upload from "../middleware/multer.js";
-// import uploadImageClodinary from "../utils/uploadImageClodinary.js";
+import upload from "../middleware/multer.js";
+import uploadImageClodinary from "../utils/uploadImageClodinary.js";
 // import generatedOtp from "../utils/generatedOtp.js";
 // import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
-// import jwt from 'jsonwebtoken'; 
+import jwt from 'jsonwebtoken'; 
  
 
 // Function to register a new user
