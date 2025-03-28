@@ -7,8 +7,8 @@ import generatedAccessToken from "../utils/generatedAccessToken.js";
 import generatedRefreshToken from "../utils/generatedRefreshToken.js";
 import upload from "../middleware/multer.js";
 import uploadImageClodinary from "../utils/uploadImageClodinary.js";
-// import generatedOtp from "../utils/generatedOtp.js";
-// import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
+import generatedOtp from "../utils/generatedOtp.js";
+import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
 import jwt from 'jsonwebtoken'; 
  
 
@@ -331,6 +331,7 @@ export async function forgotPasswordController(req,res) {
 
         const otp = generatedOtp()//teplate for generate otp in side the utils
         const expireTime = new Date() + 60 * 60 * 1000 // 1hr
+        //const expireTime = new Date(Date.now() + 60 * 60 * 1000);
 
         const update = await usermodel.findByIdAndUpdate(user._id,{
             forgot_password_otp : otp,
