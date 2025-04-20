@@ -1,0 +1,11 @@
+name: mern-app
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - "3030:3030"
