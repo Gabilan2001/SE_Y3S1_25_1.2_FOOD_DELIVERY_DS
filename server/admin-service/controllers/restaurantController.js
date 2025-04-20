@@ -1,12 +1,12 @@
 import nodemailer from "nodemailer";
 import Restaurant from "../models/restaurantModel.js";
 
-// Configure Nodemailer Transporter (Using Gmail SMTP)
+// Email transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "rashadfaris4675@gmail.com", 
-    pass: "dxtu yugd wgei apvr", 
+    user: "rashadfaris4675@gmail.com",
+    pass: "dxtu yugd wgei apvr", // App password, keep secret!
   },
 });
 
@@ -25,37 +25,25 @@ const registerRestaurant = async (req, res) => {
     }
 
     const newRestaurant = new Restaurant({
-      name,
-      owner,
-      email,
-      phone,
-      address,
-      category,
+      name, owner, email, phone, address, category,
+      status: "pending",
     });
 
     await newRestaurant.save();
 
-    // Send Registration Email
     const mailOptions = {
-      from: "rashadfaris4675@gmail.com", // Sender's email
-      to: email, // Recipient's email (restaurant's email)
+      from: "rashadfaris4675@gmail.com",
+      to: email,
       subject: "Restaurant Registration Successful",
       html: `
-        <h2>Welcome to Our Platform, ${name}!</h2>
+        <h2>Welcome, ${name}!</h2>
         <p>Dear ${owner},</p>
-        <p>Your restaurant <strong>${name}</strong> has been successfully registered.</p>
-        <p>We are excited to have you on board!</p>
-        <p>Best Regards,</p>
-        <p>Food Delivery Team</p>
+        <p>Your restaurant has been registered and is pending admin approval.</p>
       `,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-      } else {
-        console.log("Email sent:", info.response);
-      }
+      if (error) console.error("Email error:", error);
     });
 
     res.status(201).json({
@@ -68,69 +56,111 @@ const registerRestaurant = async (req, res) => {
   }
 };
 
-// Fetch details of a restaurant by ID (Admin)
+// Approve/Reject restaurant (Admin only)
+const verifyRestaurant = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!["approved", "rejected"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  try {
+    const restaurant = await Restaurant.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    const mailOptions = {
+      from: "rashadfaris4675@gmail.com",
+      to: restaurant.email,
+      subject: `Restaurant ${status.toUpperCase()}`,
+      html: `
+        <p>Dear ${restaurant.owner},</p>
+        <p>Your restaurant <strong>${restaurant.name}</strong> has been <strong>${status}</strong> by the admin.</p>
+      `,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) console.error("Email error:", error);
+    });
+
+    res.status(200).json({
+      message: `Restaurant ${status} successfully`,
+      restaurant,
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get one restaurant (Admin)
 const getRestaurantDetails = async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const restaurant = await Restaurant.findById(id);
-      if (!restaurant) {
-        return res.status(404).json({ message: "Restaurant not found" });
-      }
-  
-      res.status(200).json(restaurant);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  const { id } = req.params;
+
+  try {
+    const restaurant = await Restaurant.findById(id);
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
     }
-  };
-  
- // Update restaurant details (Admin)
+
+    res.status(200).json(restaurant);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update restaurant (Admin)
 const updateRestaurantDetails = async (req, res) => {
-    const { id } = req.params;
-    const { name, owner, email, phone, address, category } = req.body;
-  
-    try {
-      const updatedRestaurant = await Restaurant.findByIdAndUpdate(
-        id,
-        { name, owner, email, phone, address, category },
-        { new: true }
-      );
-  
-      if (!updatedRestaurant) {
-        return res.status(404).json({ message: "Restaurant not found" });
-      }
-  
-      res.status(200).json({ message: "Restaurant details updated successfully", restaurant: updatedRestaurant });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  const { id } = req.params;
+  const { name, owner, email, phone, address, category } = req.body;
+
+  try {
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
+      id,
+      { name, owner, email, phone, address, category },
+      { new: true }
+    );
+
+    if (!updatedRestaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
     }
-  };
-  
-  // Delete a restaurant (Admin)
+
+    res.status(200).json({
+      message: "Restaurant updated",
+      restaurant: updatedRestaurant,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete restaurant (Admin)
 const deleteRestaurant = async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const deletedRestaurant = await Restaurant.findByIdAndDelete(id);
-  
-      if (!deletedRestaurant) {
-        return res.status(404).json({ message: "Restaurant not found" });
-      }
-  
-      res.status(200).json({ message: "Restaurant deleted successfully" });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  const { id } = req.params;
+
+  try {
+    const deleted = await Restaurant.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Restaurant not found" });
     }
-  };
-  
 
-  
+    res.status(200).json({ message: "Restaurant deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-  
-  export {
-    registerRestaurant,
-    getRestaurantDetails,
-    updateRestaurantDetails,
-    deleteRestaurant
-  };
-  
+export {
+  registerRestaurant,
+  verifyRestaurant,
+  getRestaurantDetails,
+  updateRestaurantDetails,
+  deleteRestaurant,
+};
