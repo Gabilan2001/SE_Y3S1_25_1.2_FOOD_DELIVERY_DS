@@ -1,31 +1,20 @@
 import { Outlet } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
-// import Footer from './components/Footer'; // Uncomment if you want to use Footer
-// import { Toaster } from 'react-hot-toast'; // Uncomment if you're using Toaster
+import Footer from './components/Footer'; // Make sure this is uncommented if you're using it.
+//import { Toaster } from 'react-hot-toast'; // Assuming you want to show notifications.
 
 function App() {
   return (
     <>
-      {/* Debugging: Ensure this text shows up */}
-      <h1>gabil to check</h1> 
-
-      {/* Header should always be visible */}
+    <h1>gabil to check</h1>
       <Header />
-
       <main className='min-h-[78vh]'>
-        {/* Debugging: Ensure this text shows up */}
-        <h1>gabil to check</h1> 
-        
-        {/* Render the child components here */}
         <Outlet />
+        <h1>gabil to check</h1>
       </main>
-
-      {/* Uncomment if you're using Footer */}
-      {/* <Footer /> */}
-
-      {/* Uncomment if you're using Toaster for notifications */}
-      {/* <Toaster /> */}
+      <Footer />
+      
     </>
   );
 }

@@ -16,11 +16,11 @@ const router = createBrowserRouter([
     {
         path : "/",
         element : <App/>,
-        // children : [
-        //     {
-        //         path : "",
-        //         element : <Home/>
-        //     },
+         children : [
+             {
+                 path : "",
+                 element : <Home/>
+            },
         //     {
         //         path : "search",
         //         element : <Searchpage/>
@@ -44,11 +44,11 @@ const router = createBrowserRouter([
         //     {
         //         path : "reset-password",
         //         element : <ResetPassword/>
-        //     },
+         //    },
          
             
            
-        // ]
+         ]
     }
 ])
 

@@ -1,14 +1,31 @@
-import React from 'react'
+import React from 'react';
 
 const Header = () => {
   return (
-    <div>
-      <h1>ffffffffffffff</h1>
-    </div>
-  )
-}
+    <div className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+      <div className="container mx-auto flex items-center justify-between p-4">
+        {/* Logo */}
+        <div className="flex justify-center items-center">
+          <h1 className="text-2xl font-bold">Logo</h1>
+        </div>
 
-export default Header
+        {/* Navigation Menu */}
+        <div className="flex gap-6">
+          <button className="text-gray-700 font-medium">Home</button>
+          <button className="text-gray-700 font-medium">Search</button>
+          <button className="text-gray-700 font-medium">Login</button>
+        </div>
+
+        {/* User Icon (for testing mobile view only) */}
+        <button className="lg:hidden text-gray-700">
+          <span className="text-2xl">👤</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Header;
 
 
 
