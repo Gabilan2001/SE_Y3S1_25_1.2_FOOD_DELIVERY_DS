@@ -1,0 +1,19 @@
+# Use official Node.js image
+FROM node:18
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy environment variables and source code
+COPY .env ./
+COPY . .
+
+# Expose the service port
+EXPOSE 4001
+
+# Start the app directly, without waiting for RabbitMQ (since retry is handled in code)
+CMD ["npm", "start"]
