@@ -1,0 +1,116 @@
+.admin-navbar {
+  background-color: #2d3436;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.admin-navbar-left {
+  flex: 1;
+}
+
+.admin-logo {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.admin-navbar-center {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.search-bar input {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  width: 300px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.search-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-navbar-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.5rem;
+}
+
+.admin-notifications {
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-icon {
+  font-size: 1.2rem;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff7675;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.admin-avatar {
+  font-size: 1.2rem;
+}
+
+.admin-name {
+  font-size: 0.9rem;
+}
+
+.admin-logout-btn {
+  background-color: #ff7675;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-logout-btn:hover {
+  background-color: #d63031;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-navbar {
+    padding: 1rem;
+  }
+
+  .search-bar input {
+    width: 200px;
+  }
+
+  .admin-name {
+    display: none;
+  }
+} 

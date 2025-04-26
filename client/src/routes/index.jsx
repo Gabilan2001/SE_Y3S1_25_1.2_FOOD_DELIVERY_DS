@@ -8,8 +8,10 @@ import Home from "../pages/Home";
 //import ForgotPassword from "../pages/ForgotPassword";
 //import OtpVerification from "../pages/OtpVerification";
 //import ResetPassword from "../pages/ResetPassword";
-
-
+import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
+import UserManagement from "../pages/UserManagement/UserManagement";
+import RestaurantManagement from "../pages/RestaurantManagement/RestaurantManagement";
+import FinancialTransactions from "../pages/FinancialTransactions/FinancialTransactions";
 
 
 const router = createBrowserRouter([
@@ -21,6 +23,25 @@ const router = createBrowserRouter([
                  path : "",
                  element : <Home/>
             },
+
+            {
+                path: "admin",
+                element: <AdminDashboard />,
+                children: [
+                    {
+                        path: "user-management",
+                        element: <UserManagement />
+                    },
+                    {
+                        path: "restaurant-management",
+                        element: <RestaurantManagement />
+                    },
+                    {
+                        path: "financial-transactions",
+                        element: <FinancialTransactions />
+                    }
+                ]
+            }
         //     {
         //         path : "search",
         //         element : <Searchpage/>
