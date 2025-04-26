@@ -1,5 +1,5 @@
 import express from "express";
-import { approveDeliveryPerson, getDeliveryPersons, rejectDeliveryPerson } from "../controllers/adminController.js";
+import { approveDeliveryPerson, getDeliveryPersons, rejectDeliveryPerson } from "../controller/adminController.js";
 
 const adminRouter = express.Router();
 

@@ -1,6 +1,6 @@
-import { changePassword, getOrderById, loginDeliveryPerson, registerDeliveryPerson } from "../controllers/deliveryBoyController.js";
 import express from 'express';  // Correct import of express
 import { uploadDeliveryPersonFiles } from "../middlewares/multer.js";
+import { changePassword, getOrderById, loginDeliveryPerson, registerDeliveryPerson } from '../controller/deliveryBoyController.js';
 
 const deliveryBoy = express.Router();
 

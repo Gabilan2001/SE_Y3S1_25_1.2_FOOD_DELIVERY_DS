@@ -1,5 +1,5 @@
 import express from 'express';
-import { acceptOrder, createOrder, getAllOrders, markOrderAsDelivered, rejectOrder } from '../controllers/ItemController.js';
+import { acceptOrder, createOrder, getAllOrders, markOrderAsDelivered, rejectOrder } from '../controller/ItemController.js';
 
 const itemRouter = express.Router();
 
