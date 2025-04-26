@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import AxiosToastError from '../utils/AxiosToastError'
 import { HiOutlineExternalLink } from "react-icons/hi";
 import isAdmin from '../utils/isAdmin'
+import isRestaurantOwner from '../utils/isRestaurantOwner'
 
 const UserMenu = ({close}) => {
    const user = useSelector((state)=> state.user)
@@ -83,6 +84,28 @@ const UserMenu = ({close}) => {
                 <Link onClick={handleClose} to={"/dashboard/totalorder"} className='px-2 hover:bg-orange-200 py-1'>need to delever</Link>
               )
             }
+
+
+            {/* Check if the user is a Restaurant Owner */}
+              {
+                isRestaurantOwner(user.role) && (
+                  <Link onClick={handleClose} to={"/dashboard/subcategory"} className='px-2 hover:bg-orange-200 py-1'>Food_Type</Link>
+                )
+              }
+
+              {
+                isRestaurantOwner(user.role) && (
+                  <Link onClick={handleClose} to={"/dashboard/upload-product"} className='px-2 hover:bg-orange-200 py-1'>Add_Food</Link>
+                )
+              }
+
+              {
+                isRestaurantOwner(user.role) && (
+                  <Link onClick={handleClose} to={"/dashboard/product"} className='px-2 hover:bg-orange-200 py-1'>My_Food</Link>
+                )
+              }
+
+              {/*in hear end the restorient part only */ }
 
             <Link onClick={handleClose} to={"/dashboard/myorders"} className='px-2 hover:bg-orange-200 py-1'>My Orders</Link>
 
