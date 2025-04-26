@@ -141,6 +141,16 @@ const updateRestaurantDetails = async (req, res) => {
   }
 };
 
+// Get all restaurants (Admin)
+const getAllRestaurants = async (req, res) => {
+  try {
+    const restaurants = await Restaurant.find();
+    res.status(200).json(restaurants);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Delete restaurant (Admin)
 const deleteRestaurant = async (req, res) => {
   const { id } = req.params;
@@ -163,4 +173,5 @@ export {
   getRestaurantDetails,
   updateRestaurantDetails,
   deleteRestaurant,
+  getAllRestaurants,
 };

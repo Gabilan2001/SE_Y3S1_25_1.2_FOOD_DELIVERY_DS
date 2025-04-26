@@ -5,6 +5,7 @@ import {
   getRestaurantDetails,
   updateRestaurantDetails,
   deleteRestaurant,
+  getAllRestaurants,
 } from "../controllers/restaurantController.js";
 import { protect, isAdmin } from "../middleware/authMiddleware.js";
 
@@ -18,5 +19,7 @@ router.put("/verify-restaurant/:id", protect, isAdmin, verifyRestaurant);
 router.get("/:id", protect, isAdmin, getRestaurantDetails);
 router.put("/:id", protect, isAdmin, updateRestaurantDetails);
 router.delete("/:id", protect, isAdmin, deleteRestaurant);
+
+router.get("/restaurants", protect, isAdmin, getAllRestaurants);
 
 export default router;
