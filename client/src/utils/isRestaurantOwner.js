@@ -1,4 +1,4 @@
-const isAdmin = (s)=>{
+const isRestaurantOwner = (s)=>{
     if(s === 'RESTAURANT'){
         return true
     }
@@ -6,4 +6,4 @@ const isAdmin = (s)=>{
     return false
 }
 
-export default isAdmin
+export default isRestaurantOwner
