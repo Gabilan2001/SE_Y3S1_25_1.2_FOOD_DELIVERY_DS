@@ -88,8 +88,9 @@ const UserMenu = ({close}) => {
 
             {/* Check if the user is a Restaurant Owner */}
               {
-                isRestaurantOwner(user.role) && (
-                  <Link onClick={handleClose} to={"/dashboard/subcategory"} className='px-2 hover:bg-orange-200 py-1'>Food_Type</Link>
+               isRestaurantOwner(user.role) && (
+                
+               <Link onClick={handleClose} to={"/dashboard/subcategory"} className='px-2 hover:bg-orange-200 py-1'>Food_Type</Link>
                 )
               }
 
