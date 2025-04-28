@@ -42,7 +42,9 @@ const Header = () => {
 
   return (
     <div>
-      <header className="h-24 lg:h-20 lg:shadow-md fixed top-0 left-0 right-0 z-50 flex-col justify-center gap-1 bg-white">
+      {/* <header className="h-24 lg:h-20 lg:shadow-md fixed top-0 left-0 right-0 z-50 flex-col justify-center gap-1 bg-white"> */}
+      <header className="h-32 lg:h-28 lg:shadow-md fixed top-0 left-0 right-0 z-50 flex-col justify-center gap-1 bg-white">
+
         {
           !(isSearchPage && isMobile) && (
             <div className="container mx-auto flex items-center px-4 justify-between">
