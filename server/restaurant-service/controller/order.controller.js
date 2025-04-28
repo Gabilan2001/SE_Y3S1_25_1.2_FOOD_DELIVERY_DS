@@ -1,9 +1,9 @@
-// import Stripe from 'stripe'; // Comment out this line
-
+import Stripe from '../config/stripe.js';
 import CartProductModel from "../models/cartproduct.model.js";
 import OrderModel from "../models/order.model.js";
 import UserModel from "../models/user.model.js";
 import mongoose from "mongoose";
+import { loadStripe } from '@stripe/stripe-js';
 
 export async function CashOnDeliveryOrderController(request, response) {
     try {
@@ -49,66 +49,156 @@ export async function CashOnDeliveryOrderController(request, response) {
     }
 }
 
+
+
 export const pricewithDiscount = (price, dis = 1) => {
     const discountAmout = Math.ceil((Number(price) * Number(dis)) / 100);
     const actualPrice = Number(price) - Number(discountAmout);
     return actualPrice;
 }
 
+// export async function paymentController(request, response) {
+//     try {
+     
+//         const userId = request.userId // auth middleware 
+//         const { list_items, totalAmt, addressId, subTotalAmt } = request.body;
+
+//         const user = await UserModel.findById(userId);
+
+//         const line_items = list_items.map(item => {
+//             return {
+//                 price_data: {
+//                     currency: 'lkr',
+//                     product_data: {
+//                         name: item.productId.name,
+//                         images: item.productId.image,
+//                         metadata: {
+//                             productId: item.productId._id
+//                         }
+//                     },
+//                     unit_amount: pricewithDiscount(item.productId.price, item.productId.discount) * 100
+//                 },
+//                 adjustable_quantity: {
+//                     enabled: true,
+//                     minimum: 1
+//                 },
+//                 quantity: item.quantity
+//             };
+//         });
+
+//         const params = {
+//             submit_type: 'pay',
+//             mode: 'payment',
+//             payment_method_types: ['card'],
+//             customer_email: user.email,
+//             metadata: {
+//                 userId: userId,
+//                 addressId: addressId
+//             },
+//             line_items: line_items,
+//             success_url: `${process.env.FRONTEND_URL}/success`,
+//             cancel_url: `${process.env.FRONTEND_URL}/cancel`
+//         };
+
+//         // Commented out Stripe session creation
+//          const session = await Stripe.checkout.sessions.create(params);
+
+//         return response.status(200).json({
+//            message: "Payment session would be created here",
+//            success: true,
+//            sessionId: session.id,
+//            });
+
+//     } catch (error) {
+//         return response.status(500).json({
+//             message: error.message || error,
+//             error: true,
+//             success: false
+//         });
+//     }
+// }
+
 export async function paymentController(request, response) {
-    try {
-        const userId = request.userId // auth middleware 
-        const { list_items, totalAmt, addressId, subTotalAmt } = request.body;
+  try {
+      const userId = request.userId;
+      const { list_items, addressId } = request.body;
 
-        const user = await UserModel.findById(userId);
+      // Validate inputs
+      if (!list_items?.length) {
+          return response.status(400).json({
+              success: false,
+              message: 'Cart is empty'
+          });
+      }
 
-        const line_items = list_items.map(item => {
-            return {
-                price_data: {
-                    currency: 'inr',
-                    product_data: {
-                        name: item.productId.name,
-                        images: item.productId.image,
-                        metadata: {
-                            productId: item.productId._id
-                        }
-                    },
-                    unit_amount: pricewithDiscount(item.productId.price, item.productId.discount) * 100
-                },
-                adjustable_quantity: {
-                    enabled: true,
-                    minimum: 1
-                },
-                quantity: item.quantity
-            };
-        });
+      if (!addressId) {
+          return response.status(400).json({
+              success: false,
+              message: 'Shipping address is required'
+          });
+      }
 
-        const params = {
-            submit_type: 'pay',
-            mode: 'payment',
-            payment_method_types: ['card'],
-            customer_email: user.email,
-            metadata: {
-                userId: userId,
-                addressId: addressId
-            },
-            line_items: line_items,
-            success_url: `${process.env.FRONTEND_URL}/success`,
-            cancel_url: `${process.env.FRONTEND_URL}/cancel`
-        };
+      // Verify user and address
+      const user = await UserModel.findById(userId);
+      if (!user) {
+          return response.status(404).json({
+              success: false,
+              message: 'User not found'
+          });
+      }
 
-        // Commented out Stripe session creation
-        // const session = await Stripe.checkout.sessions.create(params);
+      // Prepare line items
+      const line_items = await Promise.all(list_items.map(async (item) => {
+          const product = await ProductModel.findById(item.productId._id);
+          if (!product) {
+              throw new Error(`Product ${item.productId._id} not found`);
+          }
 
-        return response.status(200).json({ message: "Payment session would be created here" });
+          return {
+              price_data: {
+                  currency: 'lkr',
+                  product_data: {
+                      name: product.name,
+                      images: [product.image],
+                      metadata: {
+                          productId: product._id.toString()
+                      }
+                  },
+                  unit_amount: Math.round(pricewithDiscount(product.price, product.discount)) * 100
+              },
+              quantity: item.quantity
+          };
+      }));
 
-    } catch (error) {
-        return response.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        });
-    }
+      // Create Stripe session
+      const session = await Stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          line_items,
+          mode: 'payment',
+          success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${process.env.FRONTEND_URL}/cart`,
+          metadata: {
+              userId: userId.toString(),
+              addressId: addressId.toString()
+          },
+          shipping_address_collection: {
+              allowed_countries: ['LK'] // Sri Lanka
+          }
+      });
+
+      return response.json({
+          success: true,
+          message: 'Payment session created',
+          sessionId: session.id
+      });
+
+  } catch (error) {
+      console.error('Payment error:', error);
+      return response.status(500).json({
+          success: false,
+          message: error.message || 'Payment processing failed'
+      });
+  }
 }
 
 const getOrderProductItems = async ({
@@ -148,45 +238,45 @@ const getOrderProductItems = async ({
 };
 
 // http://localhost:8080/api/order/webhook
-export async function webhookStripe(request, response) {
-    const event = request.body;
-    const endPointSecret = process.env.STRIPE_ENPOINT_WEBHOOK_SECRET_KEY;
+// export async function webhookStripe(request, response) {
+//     const event = request.body;
+//     const endPointSecret = process.env.STRIPE_ENPOINT_WEBHOOK_SECRET_KEY;
 
-    console.log("event", event);
+//     console.log("event", event);
 
-    // Handle the event
-    switch (event.type) {
-        case 'checkout.session.completed':
-            const session = event.data.object;
-            // Commented out Stripe line items listing
-            // const lineItems = await Stripe.checkout.sessions.listLineItems(session.id);
-            const userId = session.metadata.userId;
-            const orderProduct = await getOrderProductItems(
-                {
-                    lineItems: {}, // Temporarily using an empty object since we're not fetching Stripe data
-                    userId: userId,
-                    addressId: session.metadata.addressId,
-                    paymentId: session.payment_intent,
-                    payment_status: session.payment_status,
-                });
+//     // Handle the event
+//     switch (event.type) {
+//         case 'checkout.session.completed':
+//             const session = event.data.object;
+//             // Commented out Stripe line items listing
+//             // const lineItems = await Stripe.checkout.sessions.listLineItems(session.id);
+//             const userId = session.metadata.userId;
+//             const orderProduct = await getOrderProductItems(
+//                 {
+//                     lineItems: {}, // Temporarily using an empty object since we're not fetching Stripe data
+//                     userId: userId,
+//                     addressId: session.metadata.addressId,
+//                     paymentId: session.payment_intent,
+//                     payment_status: session.payment_status,
+//                 });
 
-            const order = await OrderModel.insertMany(orderProduct);
+//             const order = await OrderModel.insertMany(orderProduct);
 
-            console.log(order);
-            if (Boolean(order[0])) {
-                const removeCartItems = await UserModel.findByIdAndUpdate(userId, {
-                    shopping_cart: []
-                });
-                const removeCartProductDB = await CartProductModel.deleteMany({ userId: userId });
-            }
-            break;
-        default:
-            console.log(`Unhandled event type ${event.type}`);
-    }
+//             console.log(order);
+//             if (Boolean(order[0])) {
+//                 const removeCartItems = await UserModel.findByIdAndUpdate(userId, {
+//                     shopping_cart: []
+//                 });
+//                 const removeCartProductDB = await CartProductModel.deleteMany({ userId: userId });
+//             }
+//             break;
+//         default:
+//             console.log(`Unhandled event type ${event.type}`);
+//     }
 
-    // Return a response to acknowledge receipt of the event
-    response.json({ received: true });
-}
+//     // Return a response to acknowledge receipt of the event
+//     response.json({ received: true });
+// }
 
 export async function getOrderDetailsController(request, response) {
     try {

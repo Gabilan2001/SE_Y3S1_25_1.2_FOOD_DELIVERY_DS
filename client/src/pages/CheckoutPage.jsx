@@ -8,7 +8,8 @@ import Axios from '../utils/Axios'
 import SummaryApi from '../common/Summary'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
-import { loadStripe } from '@stripe/stripe-js'
+import { loadStripe } from '@stripe/stripe-js';
+
 
 const CheckoutPage = () => {
   const { notDiscountTotalPrice, totalPrice, totalQty, fetchCartItem,fetchOrder } = useGlobalContext()
@@ -52,36 +53,105 @@ const CheckoutPage = () => {
       }
   }
 
-  const handleOnlinePayment = async()=>{
-    try {
-        toast.loading("Loading...")
-        const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY
-        const stripePromise = await loadStripe(stripePublicKey)
+  // const handleOnlinePayment = async()=>{
+  //   try {
+  //       toast.loading("Loading...")
+  //       const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY
+  //       const stripePromise = await loadStripe(stripePublicKey)
        
-        const response = await Axios({
-            ...SummaryApi.payment_url,
-            data : {
-              list_items : cartItemsList,
-              addressId : addressList[selectAddress]?._id,
-              subTotalAmt : totalPrice,
-              totalAmt :  totalPrice,
-            }
-        })
+  //       const response = await Axios({
+  //           ...SummaryApi.payment_url,
+  //           data : {
+  //             list_items : cartItemsList,
+  //             addressId : addressList[selectAddress]?._id,
+  //             subTotalAmt : totalPrice,
+  //             totalAmt :  totalPrice,
+  //           }
+  //       })
 
-        const { data : responseData } = response
+  //       const { data : responseData } = response
 
-        stripePromise.redirectToCheckout({ sessionId : responseData.id })
+  //       stripePromise.redirectToCheckout({ sessionId : responseData.id })
         
-        if(fetchCartItem){
-          fetchCartItem()
-        }
-        if(fetchOrder){
-          fetchOrder()
-        }
+  //       if(fetchCartItem){
+  //         fetchCartItem()
+  //       }
+  //       if(fetchOrder){
+  //         fetchOrder()
+  //       }
+  //   } catch (error) {
+  //       AxiosToastError(error)
+  //   }
+  // }
+
+
+  const handleOnlinePayment = async () => {
+    try {
+      // Validate address selection
+      if (!addressList[selectAddress]?._id) {
+        toast.error('Please select a shipping address');
+        return;
+      }
+
+      // Validate cart items
+      if (cartItemsList.length === 0) {
+        toast.error('Your cart is empty');
+        return;
+      }
+
+      const loadingToast = toast.loading('Processing payment...');
+
+      // Prepare payload
+      const payload = {
+        list_items: cartItemsList.map(item => ({
+          productId: {
+            _id: item.productId._id,
+            name: item.productId.name,
+            price: item.productId.price,
+            discount: item.productId.discount || 0,
+            image: item.productId.image
+          },
+          quantity: item.quantity
+        })),
+        addressId: addressList[selectAddress]._id
+      };
+
+      // Create payment session
+      const response = await Axios({
+        ...SummaryApi.payment_url,
+        data: payload
+      });
+
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || 'Failed to create payment session');
+      }
+
+      // Initialize Stripe
+      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+      if (!stripe) {
+        throw new Error('Payment system not available');
+      }
+
+      // Redirect to Stripe checkout
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: response.data.sessionId
+      });
+
+      if (error) {
+        throw error;
+      }
+
     } catch (error) {
-        AxiosToastError(error)
+      console.error('Payment error:', error);
+      toast.error(
+        error.response?.data?.message || 
+        error.message || 
+        'Payment processing failed. Please try again.'
+      );
+    } finally {
+      toast.dismiss();
     }
-  }
+  };
 
   console.log("addressList",addressList)
   return (
