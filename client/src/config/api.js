@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3030/api';
+export const API_BASE_URL = 'http://localhost:3030/api';
 
 export const API_ENDPOINTS = {
     // Auth endpoints
@@ -22,6 +22,7 @@ activeRestaurants: `${API_BASE_URL}/restaurant/restaurants/active`,  // Fixed pa
 updateRestaurant: (id) => `${API_BASE_URL}/restaurant/restaurants/${id}`,  // Fixed path
 deleteRestaurant: (id) => `${API_BASE_URL}/restaurant/restaurants/${id}`,  // Fixed path
 
+
     // Order endpoints
     orders: `${API_BASE_URL}/orders`,
     orderById: (id) => `${API_BASE_URL}/orders/${id}`,
@@ -37,7 +38,7 @@ export const apiRequest = async (endpoint, method = 'GET', data = null, token = 
     const headers = {
         'Content-Type': 'application/json',
     };
-
+    console.log("Token passed to apiRequest:", token);  // Log token here
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }

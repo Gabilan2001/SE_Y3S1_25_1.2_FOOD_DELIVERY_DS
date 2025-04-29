@@ -1,48 +1,90 @@
 import React from 'react';
+import banner from '../assets/c_banner.png';
+import bannerMobile from '../assets/m_banner.jpeg';
+import { useSelector } from 'react-redux';
+import { valideURLConvert } from '../utils/valideURLConvert';
+import { Link, useNavigate } from 'react-router-dom';
+import CategoryWiseProductDisplay from '../components/CategoryWiseProductDisplay'
 
 const Home = () => {
+  const loadingCategory = useSelector((state) => state.product.loadingCategory);
+  const categoryData = useSelector((state) => state.product.allCategory);
+  const subCategoryData = useSelector((state) => state.product.allSubCategory);
+  const navigate = useNavigate();
+
+  const handleRedirectProductListpage = (id, cat) => {
+    console.log(id, cat);
+    const subcategory = subCategoryData.find((sub) => {
+       const filterData = sub.category.some((c) => {
+         return c._id == id;
+    
+
+      });
+
+      return filterData ? true : null;
+     });
+     const url = `/${valideURLConvert(cat)}-${id}/${valideURLConvert(subcategory.name)}-${subcategory._id}`;
+
+    navigate(url);
+     console.log(url);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header Section */}
-      <header className="bg-blue-500 text-white py-4">
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl font-bold">Welcome to the Home Page</h1>
+    <section className="bg-white mt-24">
+      <div className="container mx-auto">
+        <div
+          className={`w-full h-full min-h-48 bg-blue-100 rounded ${!banner && 'animate-pulse my-2'}`}
+        >
+          <img src={banner} className="w-full h-full hidden lg:block" alt="banner" />
+          <img src={bannerMobile} className="w-full h-full lg:hidden" alt="banner" />
         </div>
-      </header>
+      </div>
 
-      {/* Main Content Section */}
-      <main className="flex-grow py-8 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-semibold text-center mb-4">What We Do</h2>
-          <p className="text-lg text-center mb-8">
-            We provide solutions that help businesses grow and thrive in the digital age.
-          </p>
+      <div className="container mx-auto px-4 my-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+        {loadingCategory ? (
+          new Array(12).fill(null).map((_, index) => (
+            <div
+              key={index + 'loadingcategory'}
+              className="bg-white rounded p-4 min-h-36 grid gap-2 shadow animate-pulse"
+            >
+              <div className="bg-blue-100 min-h-24 rounded"></div>
+              <div className="bg-blue-100 h-8 rounded"></div>
+            </div>
+          ))
+        ) : (
+          categoryData.map((cat) => (
+            <div
+              key={cat._id + 'displayCategory'}
+              className="w-full h-full flex flex-col items-center justify-center"
+              onClick={() => handleRedirectProductListpage(cat._id, cat.name)}
+            >
+              <div className="w-32 h-32 bg-gray-100 rounded overflow-hidden">
+                <img
+                  src={cat.image}
+                  className="w-full h-full object-cover"
+                  alt={cat.name}
+                />
+              </div>
+              <div className="mt-2 text-center text-sm font-medium text-gray-700">
+                {cat.name}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
-          {/* Sample Card Section */}
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-2">Service One</h3>
-              <p>We offer top-notch web development services tailored to your business needs.</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-2">Service Two</h3>
-              <p>Our team excels in providing data analytics and business intelligence solutions.</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-2">Service Three</h3>
-              <p>We provide exceptional customer support and ongoing digital marketing strategies.</p>
-            </div>
-          </div>
-        </div>
-      </main>
+      {/***display category product */}
+      {
+        categoryData.map((c,index)=>{
+          return(
+           // <CategoryWiseProductDisplay key={c?._id+"CategoryWiseProduct"} id={"c._id"} name={c?.name}/>
+           <CategoryWiseProductDisplay key={c?._id + "CategoryWiseProduct"} id={c?._id} name={c?.name} />
 
-      {/* Footer Section */}
-      <footer className="bg-blue-500 text-white py-4">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2025 Your Company. All Rights Reserved.</p>
-        </div>
-      </footer>
-    </div>
+
+          )
+        })
+      }
+    </section>
   );
 };
 
