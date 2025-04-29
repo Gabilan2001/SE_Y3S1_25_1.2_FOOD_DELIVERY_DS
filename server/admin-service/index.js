@@ -7,7 +7,9 @@ import morgan from "morgan";
 import helmet from "helmet";
 import connectDB from "./config/connectDB.js";
 import restaurantRoutes from "./routes/restaurantRoutes.js";
-
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import adminPaymentRoutes from './routes/adminPaymentRoutes.js';
 
 const app = express();
 app.use(cors({
@@ -25,6 +27,10 @@ const PORT =  3030 || process.env.PORT;
 
 
 app.use("/api/restaurant", restaurantRoutes); 
+app.use('/api/admin', userRoutes);
+// Register the admin payment and payout routes
+app.use('/api/admin', adminPaymentRoutes);
+
 
 
 app.get("/", (req, res) => {
@@ -38,3 +44,5 @@ connectDB().then(() => {
         console.log(`Server running on port ${PORT}`);
     });
 })
+
+app.use('/api/auth', authRoutes);

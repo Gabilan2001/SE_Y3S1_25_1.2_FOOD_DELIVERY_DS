@@ -49,7 +49,11 @@ const Login = () => {
                 toast.error(response.data.message || "Error occurred during login");
             } else if (response.data.success) {
                 toast.success(response.data.message || "Login successful");
+
+                //added a log
+                console.log("Login successful, storing token:", response.data.data.accesstoken);
                 localStorage.setItem('accesstoken',response.data.data.accesstoken)
+                console.log("Token stored:", localStorage.getItem('accesstoken')); 
                 localStorage.setItem('refreshToken',response.data.data.refreshToken)
 
                 const userDetails =await fetchUserDetails()

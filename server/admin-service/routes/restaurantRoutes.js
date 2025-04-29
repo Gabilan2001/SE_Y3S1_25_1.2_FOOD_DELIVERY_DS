@@ -1,18 +1,25 @@
 import express from "express";
-import { registerRestaurant, getRestaurantDetails, updateRestaurantDetails, deleteRestaurant } from "../controllers/restaurantController.js";
+import {
+  registerRestaurant,
+  verifyRestaurant,
+  getRestaurantDetails,
+  updateRestaurantDetails,
+  deleteRestaurant,
+  getAllRestaurants,
+} from "../controllers/restaurantController.js";
+import { protect, isAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Register route
 router.post("/register", registerRestaurant);
 
-// Fetch details of a specific restaurant (Admin)
-router.get('/restaurant/:id', getRestaurantDetails);
+// Admin-only actions
+router.put("/verify-restaurant/:id", protect, isAdmin, verifyRestaurant);
 
-// Update restaurant details (Admin)
-router.put('/restaurant/:id', updateRestaurantDetails);
+router.get("/:id", protect, isAdmin, getRestaurantDetails);
+router.put("/:id", protect, isAdmin, updateRestaurantDetails);
+router.delete("/:id", protect, isAdmin, deleteRestaurant);
 
-// Delete a restaurant (Admin)
-router.delete('/restaurant/:id', deleteRestaurant);
+router.get("/restaurants", protect, isAdmin, getAllRestaurants);
 
 export default router;
