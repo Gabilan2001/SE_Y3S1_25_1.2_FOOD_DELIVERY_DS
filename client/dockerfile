@@ -8,13 +8,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-COPY .env ./
-
-# Copy the application source code
+# Copy the rest of the client code
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 3030
+# Expose Vite dev server port
+EXPOSE 80
 
-# Command to run the application
-CMD ["npm", "start"]
+# Start the Vite dev server
+CMD ["npm", "run", "dev"]
