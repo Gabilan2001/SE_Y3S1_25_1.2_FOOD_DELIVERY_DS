@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  restaurant-service:
+    build:
+      context: ./server/restaurant-service
+    container_name: restaurant-service
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./server/restaurant-service/.env
+    volumes:
+      - ./server/restaurant-service:/app
+    restart: unless-stopped
+
+  # admin-service:
+  #   build:
+  #     context: ./server/admin-service
+  #   container_name: admin-service
+  #   ports:
+  #     - "3030:3030"
+  #   env_file:
+  #     - ./server/admin-service/.env
+  #   volumes:
+  #     - ./server/admin-service:/app
+  #   restart: unless-stopped
