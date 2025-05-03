@@ -7,9 +7,11 @@ const restaurantSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   address: { type: String, required: true },
   category: { type: String, required: true },
-  registrationDate: { type: Date, default: Date.now },
-});
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+}, { timestamps: true });
 
-const Restaurant = mongoose.model("Restaurant", restaurantSchema);
-
-export default Restaurant;
+export default mongoose.model("Restaurant", restaurantSchema);

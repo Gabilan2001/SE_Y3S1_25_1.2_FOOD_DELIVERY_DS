@@ -25,7 +25,7 @@ import CheckoutPage from "../pages/CheckoutPage";
 import Success from "../pages/Success";
 import Cancel from "../pages/Cancel";
 import Totalorder from "../pages/Totalorder";
-
+import RestaurantManagement from "../pages/RestaurantManagement/RestaurantManagement";
 
 const router = createBrowserRouter([
     {
@@ -87,6 +87,10 @@ const router = createBrowserRouter([
                     {
                         path : "subcategory",
                         element : <AdminPermision><SubCategoryPage/></AdminPermision>
+                    },
+                    {
+                        path : "restaurant",
+                        element : <AdminPermision><RestaurantManagement/></AdminPermision>
                     },
                     {
                         path : 'upload-product',
